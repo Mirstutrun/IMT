@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2>Позиции бара</h2>
+  {% if role == 'admin' or role == 'excursion' %}
+  <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addModal">+ Добавить</button>
+  {% endif %}
+</div>
+<form method="get" class="mb-3 d-flex gap-2">
+  <input type="text" name="search" class="form-control w-auto" placeholder="Поиск..." value="{{ search }}">
+  <button class="btn btn-outline-primary">Найти</button>
+  {% if search %}<a href="/bar-items/" class="btn btn-outline-secondary">Сбросить</a>{% endif %}
+</form>
+<table class="table table-bordered table-hover">
+  <thead class="table-dark">
+    <tr><th>#</th><th>Наименование</th><th>Цена (руб.)</th><th>Мероприятие</th>{% if role == 'admin' or role == 'excursion' %}<th>Действия</th>{% endif %}</tr>
+  </thead>
+  <tbody>
+    {% for item in items %}
+    <tr>
+      <td>{{ forloop.counter }}</td>
+      <td>{{ item.name }}</td>
+      <td>{{ item.price }}</td>
+      <td>{{ item.excursion.organization }} ({{ item.excursion.date_start }})</td>
+      {% if role == 'admin' or role == 'excursion' %}
+      <td>
+        <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editModal"
+          onclick="fillEdit({{ item.pk }},'{{ item.name|escapejs }}','{{ item.price }}',{{ item.excursion_id }})">Ред.</button>
+        <form method="post" style="display:inline" onsubmit="return confirm('Удалить?')">
+          {% csrf_token %}<input type="hidden" name="action" value="delete"><input type="hidden" name="pk" value="{{ item.pk }}">
+          <button class="btn btn-sm btn-danger">Удал.</button>
+        </form>
+      </td>
+      {% endif %}
+    </tr>
+    {% empty %}
+    <tr><td colspan="5" class="text-center text-muted">Нет позиций</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% if role == 'admin' or role == 'excursion' %}
+<div class="modal fade" id="addModal" tabindex="-1">
+  <div class="modal-dialog"><div class="modal-content">
+    <form method="post">{% csrf_token %}<input type="hidden" name="action" value="create">
+    <div class="modal-header"><h5 class="modal-title">Добавить позицию</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+      <div class="mb-3"><label class="form-label">Наименование</label><input type="text" name="name" class="form-control" required></div>
+      <div class="mb-3"><label class="form-label">Цена (руб.)</label><input type="number" name="price" class="form-control" min="0" step="0.01" required></div>
+      <div class="mb-3"><label class="form-label">Мероприятие (Театр+)</label>
+        <select name="excursion" class="form-select" required>
+          {% for e in excursions %}<option value="{{ e.pk }}">{{ e.organization }} ({{ e.date_start }})</option>{% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer"><button type="submit" class="btn btn-success">Сохранить</button></div>
+    </form>
+  </div></div>
+</div>
+<div class="modal fade" id="editModal" tabindex="-1">
+  <div class="modal-dialog"><div class="modal-content">
+    <form method="post">{% csrf_token %}<input type="hidden" name="action" value="edit"><input type="hidden" name="pk" id="editPk">
+    <div class="modal-header"><h5 class="modal-title">Редактировать позицию</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+      <div class="mb-3"><label class="form-label">Наименование</label><input type="text" name="name" id="eName" class="form-control" required></div>
+      <div class="mb-3"><label class="form-label">Цена (руб.)</label><input type="number" name="price" id="ePrice" class="form-control" min="0" step="0.01"></div>
+      <div class="mb-3"><label class="form-label">Мероприятие</label>
+        <select name="excursion" id="eExc" class="form-select">
+          {% for e in excursions %}<option value="{{ e.pk }}">{{ e.organization }} ({{ e.date_start }})</option>{% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer"><button type="submit" class="btn btn-primary">Сохранить</button></div>
+    </form>
+  </div></div>
+</div>
+{% endif %}
+{% endblock %}
+{% block scripts %}
+<script>
+function fillEdit(pk,name,price,excId){
+  document.getElementById('editPk').value=pk;
+  document.getElementById('eName').value=name;
+  document.getElementById('ePrice').value=price;
+  document.getElementById('eExc').value=excId;
+}
+</script>
+{% endblock %}

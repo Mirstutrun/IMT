@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Сводный отчёт по мероприятиям</h2>
+<form method="get" class="row g-2 mb-4">
+    <div class="col-auto">
+        <label class="form-label">С</label>
+        <input type="date" name="date_from" class="form-control" value="{{ date_from }}">
+    </div>
+    <div class="col-auto">
+        <label class="form-label">По</label>
+        <input type="date" name="date_to" class="form-control" value="{{ date_to }}">
+    </div>
+    <<div class="col-auto align-self-end">
+        <button type="submit" class="btn btn-primary">Применить</button>
+        <a href="/" class="btn btn-outline-secondary">Сбросить</a>
+        <a href="/export-excel/?date_from={{ date_from|default:'' }}&date_to={{ date_to|default:'' }}"
+            class="btn btn-success">
+            <i class="bi bi-file-earmark-excel"></i> Скачать Excel
+        </a>
+        </div>
+</form>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card text-bg-primary">
+            <div class="card-body">
+                <h6 class="card-subtitle mb-1">Экскурсий всего</h6>
+                <h2 class="card-title">{{ stats.excursions_count }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-bg-success">
+            <div class="card-body">
+                <h6 class="card-subtitle mb-1">Участников</h6>
+                <h2 class="card-title">{{ stats.excursions_participants }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-bg-info">
+            <div class="card-body">
+                <h6 class="card-subtitle mb-1">По Пушкинской карте</h6>
+                <h2 class="card-title">{{ stats.excursions_pushkin }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-bg-warning">
+            <div class="card-body">
+                <h6 class="card-subtitle mb-1">Сумма (руб.)</h6>
+                <h2 class="card-title">{{ stats.excursions_sum }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">Типы экскурсий</div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item d-flex justify-content-between">Театр+ <span class="badge bg-primary">{{ stats.theater_plus_count }}</span></li>
+                <li class="list-group-item d-flex justify-content-between">Групповой спектакль <span
+                        class="badge bg-primary">{{ stats.group_show_count }}</span></li>
+                <li class="list-group-item d-flex justify-content-between">Групповая экскурсия <span
+                        class="badge bg-primary">{{ stats.group_excursion_count }}</span></li>
+            </ul>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">Выставки</div>
+            <div class="card-body text-center">
+                <h2>{{ stats.exhibitions_count }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">Онлайн-мероприятия</div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item d-flex justify-content-between">Трансляции <span
+                        class="badge bg-secondary">{{ stats.broadcasts_count }}</span></li>
+                <li class="list-group-item d-flex justify-content-between">Онлайн-активности <span
+                        class="badge bg-secondary">{{ stats.online_activities_count }}</span></li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
